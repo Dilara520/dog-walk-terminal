@@ -1,41 +1,57 @@
 const vscode = require('vscode');
 const ansiEscapes = require('ansi-escapes');
 const terminalImage = require('terminal-image');
+const fs = require('fs');
+const path = require('path');
 
 async function displayGif(gifPath) {
-	const gif = await terminalImage.load(gifPath);
+
+	const gif = await terminalImage.gifFile(gifPath, {width: '10%', height: '10%'});
 	const gifFrames = gif.frames;
   
+	// Get the terminal dimensions
+	const terminalWidth = vscode.window.activeTerminal.dimensions.columns;
+	const terminalHeight = vscode.window.activeTerminal.dimensions.rows;
+  
+	// Initial position at the bottom right corner
+	let xPos = terminalWidth - gifFrames[0].width;
+	const yPos = terminalHeight - gifFrames[0].height;
+  
 	for (const frame of gifFrames) {
-	  const imageData = frame.data;
-	  const imageString = await terminalImage.imageDataToString(imageData);
-  
-	  // Clear the terminal
-	  vscode.window.activeTerminal.sendText(ansiEscapes.clearScreen);
-  
-	  // Display the GIF frame
-	  vscode.window.activeTerminal.sendText(ansiEscapes.cursorTo(0, 0));
-	  vscode.window.activeTerminal.sendText(imageString);
-  
-	  // Wait for a short period of time before displaying the next frame
-	  await new Promise((resolve) => setTimeout(resolve, 100));
+		const imageData = frame.data;
+	
+		const imageString = await terminalImage.imageDataToString(imageData);
+	
+		// Move the cursor to the calculated position
+		const cursorTo = ansiEscapes.cursorTo(xPos, yPos);
+		vscode.window.activeTerminal.sendText(cursorTo);
+	
+		// Display the GIF frame - run for each frame of the GIF
+		vscode.window.activeTerminal.renderFrame(imageString);
+	
+		// Move the dog horizontally to the left
+		xPos--;
+	
+		// Wait for a short period of time before displaying the next frame
+		await new Promise((resolve) => setTimeout(resolve, 100));
 	}
-  }
-
+  
+	// run when the animation playback is stopped
+	vscode.window.activeTerminal.renderFrame.done();
+}
+  
   async function startGifLoop() {
-	const gifPaths = [
-	  // Path to the first GIF
-	  // Path to the second GIF
-	  // ...
-	];
-  
+	const gifFolder = path.join(__dirname, 'img');
+	
 	while (true) {
-	  for (const gifPath of gifPaths) {
-		await displayGif(gifPath);
-	  }
+		const gifFiles = fs.readdirSync(gifFolder);
+		for (const gifFile of gifFiles) {
+			const gifPath = path.join(gifFolder, gifFile);
+			await displayGif(gifPath);
+		  }
   
-	  // Wait for 1 hour before displaying the next GIF
-	  await new Promise((resolve) => setTimeout(resolve, 3600000));
+		// Wait for 1 hour before displaying the next GIF
+		await new Promise((resolve) => setTimeout(resolve, 3600000));
 	}
   }
 
