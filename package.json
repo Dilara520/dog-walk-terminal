@@ -42,7 +42,6 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "terminal-image": "^2.0.0",
-    "tsimportlib": "^0.0.5"
+    "terminal-image": "^2.0.0"
   }
 }
