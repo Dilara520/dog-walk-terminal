@@ -1,5 +1,4 @@
 const vscode = require('vscode');
-const ansiEscapes = require('ansi-escapes');
 const terminalImage = require('terminal-image');
 const fs = require('fs');
 const path = require('path');
@@ -23,7 +22,7 @@ async function displayGif(gifPath) {
 		const imageString = await terminalImage.imageDataToString(imageData);
 	
 		// Move the cursor to the calculated position
-		const cursorTo = ansiEscapes.cursorTo(xPos, yPos);
+		const cursorTo = `\x1b[${yPos + 1};${xPos + 1}H`;
 		vscode.window.activeTerminal.sendText(cursorTo);
 	
 		// Display the GIF frame - run for each frame of the GIF

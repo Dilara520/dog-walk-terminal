@@ -14,7 +14,9 @@
     "walk",
     "terminal"
   ],
-  "activationEvents": ["onStartupFinished"],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./extension.js",
   "contributes": {
     "commands": [
@@ -40,7 +42,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "ansi-escapes": "^6.2.0",
-    "terminal-image": "^2.0.0"
+    "terminal-image": "^2.0.0",
+    "tsimportlib": "^0.0.5"
   }
 }
